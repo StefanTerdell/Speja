@@ -8,15 +8,9 @@ using System.Threading.Tasks;
 
 public class FruchtermanReingoldSpawner : MonoBehaviour
 {
-    public enum CodeType
-    {
-        None,
-        Sync,
-        Job
-    }
-
     [Header("Node Options")]
-    public int _nodes = 100, _maxEdges = 2;
+    public int _nodes = 100;
+    public float _maxEdges = 2;
     public float _edgeChance = .1f;
     public float _medianSize = 1;
     public float _sizeRange;
@@ -26,6 +20,7 @@ public class FruchtermanReingoldSpawner : MonoBehaviour
     public GameObject _2DNodePrefab;
     public GameObject _3DNodePrefab;
     public GameObject _edgePrefab;
+    public int _cameraLayer;
     public bool _useEmissiveMaterials;
     public Material[] _emissiveMaterials;
     public Material[] _unlitMaterials;
@@ -39,9 +34,7 @@ public class FruchtermanReingoldSpawner : MonoBehaviour
     public float _speed = 20;
     public float _proximitySqr = 1;
     public bool _applyForces;
-    public CodeType _pushExecution;
 
-    bool useEmissiveMaterials;
 
     public class Node
     {
@@ -120,16 +113,17 @@ public class FruchtermanReingoldSpawner : MonoBehaviour
         }
     }
 
+    bool useEmissiveMaterials;
     List<Node> nodes;
     List<Edge> edges;
-
     NativeArray<Vector3> nodePositions;
     NativeArray<Vector3> nodeForces;
-    NativeArray<(int, Vector3)> forceOperations;
+
     void OnEnable()
     {
         nodes = new List<Node>();
         edges = new List<Edge>();
+
         Spawn();
     }
 
@@ -148,33 +142,6 @@ public class FruchtermanReingoldSpawner : MonoBehaviour
             Spawn();
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            _3D = false;
-            Spawn();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            _3D = true;
-            Spawn();
-        }
-
-        if (_useEmissiveMaterials != useEmissiveMaterials)
-        {
-            useEmissiveMaterials = _useEmissiveMaterials;
-
-            foreach (var edge in edges)
-                edge.SetMaterial(_useEmissiveMaterials
-                    ? _emissiveMaterials[_emissiveMaterials.Length - 1]
-                    : _unlitMaterials[_unlitMaterials.Length - 1]);
-
-            foreach (var node in nodes)
-                node.SetMaterial(_useEmissiveMaterials
-                    ? _emissiveMaterials[Random.Range(0, _emissiveMaterials.Length)]
-                    : _unlitMaterials[Random.Range(0, _unlitMaterials.Length)]);
-        }
-
         foreach (var edge in edges)
         {
             edge.UpdateLinerendererPositions();
@@ -191,102 +158,76 @@ public class FruchtermanReingoldSpawner : MonoBehaviour
             }
         }
 
-        if (_applyForces && _pushExecution != CodeType.None)
+        if (_applyForces)
         {
-            if (_pushExecution == CodeType.Job)
+            for (int i = 0; i < nodes.Count; i++)
             {
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    nodePositions[i] = nodes[i].position;
-                }
-
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    (new PushJob(_dispersion, _speed, i, nodePositions[i], nodePositions, nodeForces).Schedule(nodes.Count, 100)).Complete();
-                }
-
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    nodes[i].AddForce(nodeForces[i]);
-                    nodeForces[i] = Vector3.zero;
-                }
+                nodePositions[i] = nodes[i].position;
             }
-            else if (_pushExecution == CodeType.Sync)
+
+            for (int i = 0; i < nodes.Count; i++)
             {
-                foreach (var nodeA in nodes)
-                {
-                    foreach (var nodeB in nodes)
-                    {
-                        if (nodeA == nodeB)
-                            continue;
+                (new PushJob(_dispersion, _speed, i, nodePositions[i], nodePositions, nodeForces).Schedule(nodes.Count, 100)).Complete();
+            }
 
-                        var diff = nodeB.position - nodeA.position;
-                        nodeForces[nodes.IndexOf(nodeB)] += diff / diff.sqrMagnitude * _dispersion * _dispersion * _speed;
-                        // nodeB.AddForce(diff / diff.sqrMagnitude * _dispersion * _dispersion * _speed);
-                    }
-                }
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                nodes[i].AddForce(nodeForces[i]);
+                nodeForces[i] = Vector3.zero;
 
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    nodes[i].AddForce(nodeForces[i]);
-                    nodeForces[i] = Vector3.zero;
-
-                }
+                nodes[i].ApplyForce();
             }
         }
-
-        if (_applyForces)
-            foreach (var node in nodes)
-                node.ApplyForce();
     }
 
     [BurstCompile]
     public struct PushJob : IJobParallelFor
     {
-        Vector3 nodeAPosition;
-        int nodeAIndex;
+        Vector3 repellingNodePosition;
+        int repellingNodeIndex;
         NativeArray<Vector3> nodePositions;
         NativeArray<Vector3> nodeForces;
 
-        float _dispersion, _speed;
+        float dispersion, speed;
 
-        public PushJob(float _dispersion, float _speed, int nodeAIndex, Vector3 nodeAPosition, NativeArray<Vector3> nodePositions, NativeArray<Vector3> nodeForces)
+        public PushJob(float dispersion, float speed, int nodeAIndex, Vector3 nodeAPosition, NativeArray<Vector3> nodePositions, NativeArray<Vector3> nodeForces)
         {
-            this._dispersion = _dispersion;
-            this._speed = _speed;
-            this.nodeAPosition = nodeAPosition;
-            this.nodeAIndex = nodeAIndex;
+            this.dispersion = dispersion;
+            this.speed = speed;
+            this.repellingNodePosition = nodeAPosition;
+            this.repellingNodeIndex = nodeAIndex;
             this.nodePositions = nodePositions;
             this.nodeForces = nodeForces;
         }
 
-        public void Execute(int nodeBIndex)
+        public void Execute(int targetNodeIndex)
         {
-            if (nodeAIndex == nodeBIndex)
+            if (repellingNodeIndex == targetNodeIndex)
                 return;
 
-            var diff = nodePositions[nodeBIndex] - nodeAPosition;
+            var spatialDifference = nodePositions[targetNodeIndex] - repellingNodePosition;
 
-            nodeForces[nodeBIndex] += diff / diff.sqrMagnitude * _dispersion * _dispersion * _speed;
+            nodeForces[targetNodeIndex] += spatialDifference / spatialDifference.sqrMagnitude * dispersion * dispersion * speed;
         }
     }
 
     void Spawn()
     {
-        foreach (var node in nodes)
-            node.Destroy();
+        Camera.main.gameObject.layer = _cameraLayer;
+        
+        ClearSpawnedObjects();
 
-        nodes.Clear();
+        SpawnRandomNodesAndEdges();
 
-        foreach (var edge in edges)
-            edge.Destroy();
+        AllocateNativeArrays();
+    }
 
-        edges.Clear();
-
-
+    void SpawnRandomNodesAndEdges()
+    {
         for (int i = 0; i < _nodes; i++)
         {
             var nodeObj = Instantiate(_3D ? _3DNodePrefab : _2DNodePrefab, (_3D ? Random.insideUnitSphere : (Vector3)Random.insideUnitCircle) * _spawnRadius, Quaternion.identity, transform);
+
 
             nodeObj.transform.localScale = Vector3.one * (_medianSize + Random.value * _sizeRange - _sizeRange * .5f);
 
@@ -317,7 +258,23 @@ public class FruchtermanReingoldSpawner : MonoBehaviour
                 edges.Add(edge);
             }
         }
+    }
 
+    void ClearSpawnedObjects()
+    {
+        foreach (var node in nodes)
+            node.Destroy();
+
+        nodes.Clear();
+
+        foreach (var edge in edges)
+            edge.Destroy();
+
+        edges.Clear();
+    }
+
+    void AllocateNativeArrays()
+    {
         if (nodePositions.IsCreated)
             nodePositions.Dispose();
 
