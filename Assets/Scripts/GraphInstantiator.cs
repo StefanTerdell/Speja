@@ -12,6 +12,9 @@ public class GraphInstantiator : MonoBehaviour
     public Material[] _emissiveMaterials;
     public Material[] _unlitMaterials;
     public float _spawnRadius = 10;
+    public float _layerSeparation = 5;
+    public bool _useLayerSeparation;
+    public bool _respawn;
 
     Dictionary<NodeData, Node> nodeTable = new Dictionary<NodeData, Node>();
     Dictionary<EdgeData, Edge> edgeTable = new Dictionary<EdgeData, Edge>();
@@ -31,6 +34,12 @@ public class GraphInstantiator : MonoBehaviour
         {
             __3D = _3D;
             SwitchProjection();
+        }
+
+        if (_respawn)
+        {
+            _respawn = false;
+            RespawnAll();
         }
 
         foreach (var edge in Edges)
@@ -61,7 +70,7 @@ public class GraphInstantiator : MonoBehaviour
         {
             ReinstantiateNode(node);
         }
-        
+
         foreach (var edge in Edges)
         {
             edge.Set3D(_3D);
@@ -110,8 +119,8 @@ public class GraphInstantiator : MonoBehaviour
     void InstantiateNode(NodeData nodeData)
     {
         var type = NodeTypes.GetType(nodeData.type);
-        
-        var nodeObj = Instantiate(_3D ? _3DNodePrefab : _2DNodePrefab, (_3D ? Random.insideUnitSphere : (Vector3)Random.insideUnitCircle) * _spawnRadius, Quaternion.identity, transform);
+
+        var nodeObj = Instantiate(_3D ? _3DNodePrefab : _2DNodePrefab, GetNodeInstantiationPosition(type), Quaternion.identity, transform);
 
         nodeObj.transform.localScale = Vector3.one * type.size;
 
@@ -119,45 +128,48 @@ public class GraphInstantiator : MonoBehaviour
 
         var renderers = nodeObj.GetComponentsInChildren<MeshRenderer>();
 
-        foreach (var render in renderers)
-        {
-            if (_useEmissiveMaterials)
-            {
-                render.material = _emissiveMaterials[0];
-                render.material.SetColor("_EmissionColor", type.color);
-            }
-            else
-            {
-                render.material = _unlitMaterials[0];
-            }
-
-            render.material.color = type.color;
-        }
+        SetNodeRendererColors(renderers, type);
 
         var node = new Node(rb, renderers, nodeData.type);
+
+        node.SetYLock(_useLayerSeparation);
 
         nodeTable.Add(nodeData, node);
 
         Nodes.Add(node);
 
         if (OnNodeAdded != null)
-            OnNodeAdded(null, System.EventArgs.Empty);
+            OnNodeAdded(node, System.EventArgs.Empty);
     }
 
-    void ReinstantiateNode(Node node)
+    Vector3 GetNodeInstantiationPosition(NodeTypes.Type type)
     {
-        var type = NodeTypes.GetType(node.type);
+        var position = _3D
+            ? Random.insideUnitSphere * _spawnRadius
+            : (Vector3)Random.insideUnitCircle * _spawnRadius;
 
-        var nodeObj = Instantiate(_3D ? _3DNodePrefab : _2DNodePrefab, new Vector3(node.position.x, node.position.y, _3D ? Random.value - .5f : 0), Quaternion.identity, transform);
-        
-        nodeObj.transform.localScale = Vector3.one * type.size;
-        
-        var rb = nodeObj.GetComponent<Rigidbody>();
+        if (_useLayerSeparation)
+            position.y = type.layer * _layerSeparation;
 
-        rb.isKinematic = node.isKinematic;
+        return position;
+    }
 
-        var renderers = nodeObj.GetComponentsInChildren<MeshRenderer>();
+    Vector3 GetNodeReinstantiationPosition(Node node)
+    {
+        return new Vector3()
+        {
+            x = node.position.x,
+            y = _useLayerSeparation
+                ? NodeTypes.GetType(node.type).layer * _layerSeparation
+                : node.position.y,
+            z = _3D
+                ? Random.value - .5f
+                : 0
+        };
+    }
 
+    void SetNodeRendererColors(MeshRenderer[] renderers, NodeTypes.Type type)
+    {
         foreach (var render in renderers)
         {
             if (_useEmissiveMaterials)
@@ -172,10 +184,29 @@ public class GraphInstantiator : MonoBehaviour
 
             render.material.color = type.color;
         }
+    }
+
+    void ReinstantiateNode(Node node)
+    {
+        var type = NodeTypes.GetType(node.type);
+
+        var nodeObj = Instantiate(_3D ? _3DNodePrefab : _2DNodePrefab, GetNodeReinstantiationPosition(node), Quaternion.identity, transform);
+
+        nodeObj.transform.localScale = Vector3.one * type.size;
+
+        var rb = nodeObj.GetComponent<Rigidbody>();
+
+        rb.isKinematic = node.isKinematic;
+
+        var renderers = nodeObj.GetComponentsInChildren<MeshRenderer>();
+
+        SetNodeRendererColors(renderers, type);
 
         node.DestroyGameObject();
 
         node.SetComponents(rb, renderers);
+
+        node.SetYLock(_useLayerSeparation);
     }
 
     void InstantiateEdgeHandler(object o, System.EventArgs e) => InstantiateEdge(o as EdgeData);
@@ -202,7 +233,7 @@ public class GraphInstantiator : MonoBehaviour
         nodeTable.Remove(nodeData);
 
         if (OnNodeRemoved != null)
-            OnNodeRemoved(null, System.EventArgs.Empty);
+            OnNodeRemoved(node, System.EventArgs.Empty);
     }
 
     void DestroyEdgeHandler(object o, System.EventArgs e) => DestroyEdge(o as EdgeData);

@@ -8,9 +8,8 @@ public class NodeTypes : MonoBehaviour
     public class Type {
         public string name = "Unassigned";
         public Color color = Color.grey;
-        [ColorUsage(true, true)]
-        public Color emissionColor = Color.red;
         public float size = 1;
+        public int layer;
     }
 
     public List<Type> types = new List<Type>();

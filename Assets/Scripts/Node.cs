@@ -24,6 +24,15 @@ public class Node
         this.meshRenderers = meshRenderers;
     }
 
+    public void SetYLock(bool lockY)
+    {
+        if (lockY)
+            rigidbody.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
+        else
+            rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
+
+    }
+
     public void SetMaterial(Material mat)
     {
         foreach (var meshRenderer in meshRenderers)

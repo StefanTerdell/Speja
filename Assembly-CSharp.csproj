@@ -53,12 +53,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Labels.cs" />
      <Compile Include="Assets\Scripts\CameraMover.cs" />
      <Compile Include="Assets\Scripts\Edge.cs" />
      <Compile Include="Assets\Scripts\EdgeData.cs" />
      <Compile Include="Assets\Scripts\FruchtermanReingold.cs" />
      <Compile Include="Assets\Scripts\GraphData.cs" />
      <Compile Include="Assets\Scripts\GraphInstantiator.cs" />
+     <Compile Include="Assets\Scripts\Neo4jServer.cs" />
      <Compile Include="Assets\Scripts\Node.cs" />
      <Compile Include="Assets\Scripts\NodeData.cs" />
      <Compile Include="Assets\Scripts\NodeTypes.cs" />
@@ -70,7 +72,6 @@
      <Compile Include="Assets\Scripts\Old\MeshSpawner.cs" />
      <Compile Include="Assets\Scripts\Old\Relation.cs" />
      <Compile Include="Assets\Scripts\RbMover.cs" />
-     <Compile Include="Assets\Scripts\Server.cs" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
      <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />

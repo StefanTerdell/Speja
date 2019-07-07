@@ -23,7 +23,7 @@ public class CameraMover : MonoBehaviour
     {
         if (cam.orthographic)
         {
-            if (Input.GetKeyDown(KeyCode.Mouse2))
+            if (Input.GetKeyDown(KeyCode.Mouse2) || Input.GetKeyDown(KeyCode.Space))
             {
                 gi._3D = true;
 
@@ -57,11 +57,13 @@ public class CameraMover : MonoBehaviour
 
                 if (Input.GetKey(KeyCode.E))
                     transform.Translate(Vector3.down * Time.deltaTime * currentMoveSpeed);
+
+                transform.Translate(new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * currentMoveSpeed * Time.deltaTime * -2);
             }
         }
         else
         {
-            if (Input.GetKeyDown(KeyCode.Mouse2))
+            if (Input.GetKeyDown(KeyCode.Mouse2) || Input.GetKeyDown(KeyCode.Space))
             {
                 gi._3D = false;
 
