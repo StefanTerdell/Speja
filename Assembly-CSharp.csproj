@@ -53,16 +53,24 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\ForceNodeSpawner.cs" />
-     <Compile Include="Assets\RbMover.cs" />
      <Compile Include="Assets\Scripts\CameraMover.cs" />
-     <Compile Include="Assets\Scripts\Circle.cs" />
-     <Compile Include="Assets\Scripts\CircleSpawner.cs" />
-     <Compile Include="Assets\Scripts\FruchtermanReingoldSpawner.cs" />
-     <Compile Include="Assets\Scripts\GenMeshSpawner.cs" />
-     <Compile Include="Assets\Scripts\MeshGenerator.cs" />
-     <Compile Include="Assets\Scripts\MeshSpawner.cs" />
-     <Compile Include="Assets\Scripts\Relation.cs" />
+     <Compile Include="Assets\Scripts\Edge.cs" />
+     <Compile Include="Assets\Scripts\EdgeData.cs" />
+     <Compile Include="Assets\Scripts\FruchtermanReingold.cs" />
+     <Compile Include="Assets\Scripts\GraphData.cs" />
+     <Compile Include="Assets\Scripts\GraphInstantiator.cs" />
+     <Compile Include="Assets\Scripts\Node.cs" />
+     <Compile Include="Assets\Scripts\NodeData.cs" />
+     <Compile Include="Assets\Scripts\NodeTypes.cs" />
+     <Compile Include="Assets\Scripts\Old\Circle.cs" />
+     <Compile Include="Assets\Scripts\Old\CircleSpawner.cs" />
+     <Compile Include="Assets\Scripts\Old\ForceNodeSpawner.cs" />
+     <Compile Include="Assets\Scripts\Old\GenMeshSpawner.cs" />
+     <Compile Include="Assets\Scripts\Old\MeshGenerator.cs" />
+     <Compile Include="Assets\Scripts\Old\MeshSpawner.cs" />
+     <Compile Include="Assets\Scripts\Old\Relation.cs" />
+     <Compile Include="Assets\Scripts\RbMover.cs" />
+     <Compile Include="Assets\Scripts\Server.cs" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
      <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
@@ -111,8 +119,14 @@
  <Reference Include="Unity.CollabProxy.Editor">
  <HintPath>C:/git/AWA-Unity/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
  </Reference>
+ <Reference Include="Unity.Postprocessing.Editor">
+ <HintPath>C:/git/AWA-Unity/Library/ScriptAssemblies/Unity.Postprocessing.Editor.dll</HintPath>
+ </Reference>
  <Reference Include="Unity.Mathematics">
  <HintPath>C:/git/AWA-Unity/Library/ScriptAssemblies/Unity.Mathematics.dll</HintPath>
+ </Reference>
+ <Reference Include="Unity.Postprocessing.Runtime">
+ <HintPath>C:/git/AWA-Unity/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VisualStudio.Editor">
  <HintPath>C:/git/AWA-Unity/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
@@ -134,12 +148,6 @@
  </Reference>
  <Reference Include="Unity.ugui.Editor">
  <HintPath>C:/git/AWA-Unity/Library/ScriptAssemblies/Unity.ugui.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Postprocessing.Editor">
- <HintPath>C:/git/AWA-Unity/Library/ScriptAssemblies/Unity.Postprocessing.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Unity.Postprocessing.Runtime">
- <HintPath>C:/git/AWA-Unity/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.0b3/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

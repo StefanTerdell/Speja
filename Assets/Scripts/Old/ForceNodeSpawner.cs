@@ -2,32 +2,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Node
-{
-    public Rigidbody rb;
-    public List<Edge> edges = new List<Edge>();
-    public List<Node> disconnected = new List<Node>();
-
-    public class Edge
-    {
-        public LineRenderer lr;
-        public Node node;
-
-        public Edge(Node node, LineRenderer lr)
-        {
-            this.node = node;
-            this.lr = lr;
-        }
-    }
-
-    public Node(Rigidbody rb)
-    {
-        this.rb = rb;
-    }
-}
 
 public class ForceNodeSpawner : MonoBehaviour
 {
+    public class Node
+    {
+        public Rigidbody rb;
+        public List<Edge> edges = new List<Edge>();
+        public List<Node> disconnected = new List<Node>();
+
+        public class Edge
+        {
+            public LineRenderer lr;
+            public Node node;
+
+            public Edge(Node node, LineRenderer lr)
+            {
+                this.node = node;
+                this.lr = lr;
+            }
+        }
+
+        public Node(Rigidbody rb)
+        {
+            this.rb = rb;
+        }
+    }
     public int _nodes = 10;
     public float _edgeChance = .3f;
     public GameObject _nodePrefab, _edgePrefab;

@@ -2,13 +2,19 @@
 
 public class CameraMover : MonoBehaviour
 {
-    const float walkSpeed = 10, runSpeed = 25, rotationSpeed = 10;
-    float moveSpeed;
+    
+    GraphInstantiator gi;
+    public float rotationSpeed;
+    public float moveSpeed;
+    public float shiftMultiplier;
+    public float ctrlMultiplier;
+    float currentMoveSpeed;
 
     float perspectiveZPosition;
     Camera cam;
     void Start()
     {
+        gi = FindObjectOfType<GraphInstantiator>();
         perspectiveZPosition = transform.position.z;
         cam = GetComponent<Camera>();
     }
@@ -19,6 +25,8 @@ public class CameraMover : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Mouse2))
             {
+                gi._3D = true;
+
                 cam.orthographic = false;
                 transform.position = new Vector3(transform.position.x, transform.position.y, perspectiveZPosition);
                 return;
@@ -26,33 +34,37 @@ public class CameraMover : MonoBehaviour
 
             if (Input.GetKey(KeyCode.Mouse1))
             {
-                moveSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
+                currentMoveSpeed = moveSpeed;
 
-                moveSpeed *= Input.GetKey(KeyCode.LeftControl) ? 2 : 1;
+                currentMoveSpeed *= Input.GetKey(KeyCode.LeftShift) ? shiftMultiplier : 1;
+
+                currentMoveSpeed *= Input.GetKey(KeyCode.LeftControl) ? ctrlMultiplier : 1;
 
                 if (Input.GetKey(KeyCode.W))
-                    cam.orthographicSize -= Time.deltaTime * moveSpeed;
+                    cam.orthographicSize -= Time.deltaTime * currentMoveSpeed;
 
                 if (Input.GetKey(KeyCode.S))
-                    cam.orthographicSize += Time.deltaTime * moveSpeed;
+                    cam.orthographicSize += Time.deltaTime * currentMoveSpeed;
 
                 if (Input.GetKey(KeyCode.D))
-                    transform.Translate(Vector3.right * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.right * Time.deltaTime * currentMoveSpeed);
 
                 if (Input.GetKey(KeyCode.A))
-                    transform.Translate(Vector3.left * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.left * Time.deltaTime * currentMoveSpeed);
 
                 if (Input.GetKey(KeyCode.Q))
-                    transform.Translate(Vector3.up * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.up * Time.deltaTime * currentMoveSpeed);
 
                 if (Input.GetKey(KeyCode.E))
-                    transform.Translate(Vector3.down * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.down * Time.deltaTime * currentMoveSpeed);
             }
         }
         else
         {
             if (Input.GetKeyDown(KeyCode.Mouse2))
             {
+                gi._3D = false;
+
                 cam.orthographic = true;
                 transform.eulerAngles = Vector3.zero;
                 perspectiveZPosition = transform.position.z;
@@ -66,27 +78,29 @@ public class CameraMover : MonoBehaviour
                     transform.eulerAngles.x + Input.GetAxis("Mouse Y") * rotationSpeed * -1,
                     transform.eulerAngles.y + Input.GetAxis("Mouse X") * rotationSpeed);
 
-                moveSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
+                currentMoveSpeed = moveSpeed;
 
-                moveSpeed *= Input.GetKey(KeyCode.LeftControl) ? 2 : 1;
+                currentMoveSpeed *= Input.GetKey(KeyCode.LeftShift) ? shiftMultiplier : 1;
+
+                currentMoveSpeed *= Input.GetKey(KeyCode.LeftControl) ? ctrlMultiplier : 1;
 
                 if (Input.GetKey(KeyCode.W))
-                    transform.Translate(Vector3.forward * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.forward * Time.deltaTime * currentMoveSpeed);
 
                 if (Input.GetKey(KeyCode.S))
-                    transform.Translate(Vector3.back * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.back * Time.deltaTime * currentMoveSpeed);
 
                 if (Input.GetKey(KeyCode.D))
-                    transform.Translate(Vector3.right * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.right * Time.deltaTime * currentMoveSpeed);
 
                 if (Input.GetKey(KeyCode.A))
-                    transform.Translate(Vector3.left * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.left * Time.deltaTime * currentMoveSpeed);
 
                 if (Input.GetKey(KeyCode.Q))
-                    transform.Translate(Vector3.up * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.up * Time.deltaTime * currentMoveSpeed);
 
                 if (Input.GetKey(KeyCode.E))
-                    transform.Translate(Vector3.down * Time.deltaTime * moveSpeed);
+                    transform.Translate(Vector3.down * Time.deltaTime * currentMoveSpeed);
             }
         }
     }
