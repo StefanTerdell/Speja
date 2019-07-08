@@ -130,7 +130,7 @@ public class GraphInstantiator : MonoBehaviour
 
         SetNodeRendererColors(renderers, type);
 
-        var node = new Node(rb, renderers, nodeData);
+        var node = new Node(rb, renderers, nodeData, type);
 
         node.SetYLock(_useLayerSeparation);
 
@@ -142,7 +142,7 @@ public class GraphInstantiator : MonoBehaviour
             OnNodeAdded(node, System.EventArgs.Empty);
     }
 
-    Vector3 GetNodeInstantiationPosition(NodeTypes.Type type)
+    Vector3 GetNodeInstantiationPosition(NodeType type)
     {
         var position = _3D
             ? Random.insideUnitSphere * _spawnRadius
@@ -160,7 +160,7 @@ public class GraphInstantiator : MonoBehaviour
         {
             x = node.position.x,
             y = _useLayerSeparation
-                ? NodeTypes.GetType(node.nodeData.type).layer * _layerSeparation
+                ? node.type.layer * _layerSeparation
                 : node.position.y,
             z = _3D
                 ? Random.value - .5f
@@ -168,7 +168,7 @@ public class GraphInstantiator : MonoBehaviour
         };
     }
 
-    void SetNodeRendererColors(MeshRenderer[] renderers, NodeTypes.Type type)
+    void SetNodeRendererColors(MeshRenderer[] renderers, NodeType type)
     {
         foreach (var render in renderers)
         {
@@ -188,11 +188,9 @@ public class GraphInstantiator : MonoBehaviour
 
     void ReinstantiateNode(Node node)
     {
-        var type = NodeTypes.GetType(node.nodeData.type);
-
         var nodeObj = Instantiate(_3D ? _3DNodePrefab : _2DNodePrefab, GetNodeReinstantiationPosition(node), Quaternion.identity, transform);
 
-        nodeObj.transform.localScale = Vector3.one * type.size;
+        nodeObj.transform.localScale = Vector3.one * node.type.size;
 
         var rb = nodeObj.GetComponent<Rigidbody>();
 
@@ -200,7 +198,7 @@ public class GraphInstantiator : MonoBehaviour
 
         var renderers = nodeObj.GetComponentsInChildren<MeshRenderer>();
 
-        SetNodeRendererColors(renderers, type);
+        SetNodeRendererColors(renderers, node.type);
 
         node.DestroyGameObject();
 
