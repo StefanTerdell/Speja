@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class Labels : MonoBehaviour
 {
+    public bool _name, _type;
     public bool _respawn;
     public float _cullingDistance = 30;
     public float _scaleMultiplier = 10;
+    public float _maxScale = 10;
     public GameObject _labelPrefab;
     Camera cam;
+
+    bool name, type;
     Dictionary<Node, (GameObject obj, RectTransform rect)> nodeLabels = new Dictionary<Node, (GameObject obj, RectTransform rect)>();
 
     private void OnEnable()
     {
+        name = _name;
+        type = _type;
         cam = Camera.main;
         GraphInstantiator.OnNodeAdded += AddNodeLabelHandler;
         GraphInstantiator.OnNodeRemoved += RemoveNodeLabelHandler;
@@ -47,7 +53,7 @@ public class Labels : MonoBehaviour
     void AddNodeLabel(Node node)
     {
         var obj = Instantiate(_labelPrefab, node.position, Quaternion.identity, transform);
-        obj.GetComponent<TMPro.TextMeshProUGUI>().text = $"{node.data.type}\n{node.data.name}";
+        obj.GetComponent<TMPro.TextMeshProUGUI>().text = _name && _type ? $"{node.data.type}\n{node.data.name}" : _type ? $"{node.data.type}" : _name ? $"{node.data.name}" : string.Empty;
         nodeLabels.Add(node, (obj, obj.GetComponent<RectTransform>()));
     }
 
@@ -58,6 +64,15 @@ public class Labels : MonoBehaviour
         nodeLabels.Remove(node);
     }
 
+    void ResetTexts()
+    {
+        foreach (var nodeLabel in nodeLabels)
+        {
+            var node = nodeLabel.Key;
+            nodeLabel.Value.obj.GetComponent<TMPro.TextMeshProUGUI>().text = _name && _type ? $"{node.data.type}\n{node.data.name}" : _type ? $"{node.data.type}" : _name ? $"{node.data.name}" : string.Empty;
+        }
+    }
+
     void LateUpdate()
     {
         if (_respawn)
@@ -65,6 +80,14 @@ public class Labels : MonoBehaviour
             _respawn = false;
 
             ResetAll();
+        }
+
+        if (name != _name || type != _type)
+        {
+            name = _name;
+            type = _type;
+
+            ResetTexts();
         }
 
         var plane = new Plane(cam.transform.forward, cam.transform.position);
@@ -80,7 +103,7 @@ public class Labels : MonoBehaviour
                 nodeLabel.Value.obj.SetActive(true);
 
                 nodeLabel.Value.rect.position = cam.WorldToScreenPoint(nodeLabel.Key.position);
-                nodeLabel.Value.obj.transform.localScale = Vector3.one * _scaleMultiplier / dist;// Vector3.one * Mathf.Max(0, (1 - Mathf.Log10((nodeLabel.Key.position - cam.transform.position).sqrMagnitude / 10))) * 3;
+                nodeLabel.Value.obj.transform.localScale = Vector3.one * Mathf.Min(_maxScale, _scaleMultiplier / dist);
             }
         }
     }

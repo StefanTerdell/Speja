@@ -19,6 +19,7 @@ public class RbMover : MonoBehaviour
             if (caughtRigidbody)
             {
                 caughtRigidbody.isKinematic = true;
+                caughtRigidbody.gameObject.layer = 8;
 
                 var multiplier = cam.orthographic ? cam.orthographicSize * .05f : Vector3.Distance(transform.position, caughtRigidbody.position) * .025f;
 
@@ -39,6 +40,7 @@ public class RbMover : MonoBehaviour
             if (holdTime < .2f)
                 caughtRigidbody.isKinematic = false;
 
+            caughtRigidbody.gameObject.layer = 0;
             holdTime = 0;
             caughtRigidbody = null;
         }
