@@ -857,10 +857,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b2983f226dccf64a85257226bc17e1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 10
-  moveSpeed: 25
-  shiftMultiplier: 2
-  ctrlMultiplier: 4
+  _rotationSpeed: 10
+  _moveSpeed: 25
+  _shiftMultiplier: 2
+  _ctrlMultiplier: 4
 --- !u!114 &1056093527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1839,8 +1839,8 @@ MonoBehaviour:
   EdgeCount: 0
   _addNeo4jNodes: 0
   _sendReset: 0
-  _nodesToAdd: 1
-  _addNodes: 1
+  _nodesToAdd: 0
+  _addNodes: 0
   _nodesToRemove: 0
   _removeNodes: 0
   _maxEdges: 2

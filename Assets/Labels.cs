@@ -47,7 +47,7 @@ public class Labels : MonoBehaviour
     void AddNodeLabel(Node node)
     {
         var obj = Instantiate(_labelPrefab, node.position, Quaternion.identity, transform);
-        obj.GetComponent<TMPro.TextMeshProUGUI>().text = node.type;
+        obj.GetComponent<TMPro.TextMeshProUGUI>().text = $"{node.nodeData.type}\n{node.nodeData.name}";
         nodeLabels.Add(node, (obj, obj.GetComponent<RectTransform>()));
     }
 

@@ -9,13 +9,13 @@ public class Node
     Rigidbody rigidbody;
     MeshRenderer[] meshRenderers;
 
-    public string type;
+    public NodeData nodeData;
 
-    public Node(Rigidbody rigidbody, MeshRenderer[] meshRenderers, string type)
+    public Node(Rigidbody rigidbody, MeshRenderer[] meshRenderers, NodeData nodeData)
     {
         this.rigidbody = rigidbody;
         this.meshRenderers = meshRenderers;
-        this.type = type;
+        this.nodeData = nodeData;
     }
 
     public void SetComponents(Rigidbody rigidbody, MeshRenderer[] meshRenderers)

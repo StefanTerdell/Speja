@@ -125,11 +125,14 @@ public class GraphData : MonoBehaviour
         }
     }
 
-    NodeData AddNode(string type)
+    NodeData AddNode(string uuid, string type, string name)
     {
-        var node = new NodeData();
-
-        node.type = type;
+        var node = new NodeData()
+        {
+            uuid = uuid,
+            type = type,
+            name = name
+        };
 
         nodes.Add(node);
 
@@ -139,14 +142,17 @@ public class GraphData : MonoBehaviour
         return node;
     }
 
-    EdgeData AddEdge(NodeData from, NodeData to)
+    EdgeData AddEdge(string uuid, string type, NodeData from, NodeData to)
     {
-        var edge = new EdgeData();
+        var edge = new EdgeData()
+        {
+            uuid = uuid,
+            type = type,
+            from = from,
+            to = to
+        };
 
         edges.Add(edge);
-
-        edge.from = from;
-        edge.to = to;
 
         if (OnEdgeAdded != null)
             OnEdgeAdded(edge, EventArgs.Empty);
@@ -158,10 +164,17 @@ public class GraphData : MonoBehaviour
     {
         for (int i = 0; i < nodesToAdd; i++)
         {
-            var node = AddNode(NodeTypes.GetRandomTypeName());
+            var node = AddNode(Guid.NewGuid().ToString(), NodeTypes.GetRandomTypeName(), RandomString(10));
 
             AddRandomEdges(node);
         }
+    }
+
+    public static string RandomString(int length)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyzåäö";
+        return new string(Enumerable.Repeat(chars, length)
+          .Select(s => s[UnityEngine.Random.Range(0, s.Length)]).ToArray());
     }
 
     void AddRandomEdges(NodeData node)
@@ -181,7 +194,7 @@ public class GraphData : MonoBehaviour
 
             otherNodes.Remove(otherNode);
 
-            AddEdge(node, otherNode);
+            AddEdge(Guid.NewGuid().ToString(), RandomString(5), node, otherNode);
             edges++;
         }
     }

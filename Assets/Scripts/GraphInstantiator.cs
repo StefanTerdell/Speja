@@ -130,7 +130,7 @@ public class GraphInstantiator : MonoBehaviour
 
         SetNodeRendererColors(renderers, type);
 
-        var node = new Node(rb, renderers, nodeData.type);
+        var node = new Node(rb, renderers, nodeData);
 
         node.SetYLock(_useLayerSeparation);
 
@@ -160,7 +160,7 @@ public class GraphInstantiator : MonoBehaviour
         {
             x = node.position.x,
             y = _useLayerSeparation
-                ? NodeTypes.GetType(node.type).layer * _layerSeparation
+                ? NodeTypes.GetType(node.nodeData.type).layer * _layerSeparation
                 : node.position.y,
             z = _3D
                 ? Random.value - .5f
@@ -188,7 +188,7 @@ public class GraphInstantiator : MonoBehaviour
 
     void ReinstantiateNode(Node node)
     {
-        var type = NodeTypes.GetType(node.type);
+        var type = NodeTypes.GetType(node.nodeData.type);
 
         var nodeObj = Instantiate(_3D ? _3DNodePrefab : _2DNodePrefab, GetNodeReinstantiationPosition(node), Quaternion.identity, transform);
 
@@ -214,7 +214,7 @@ public class GraphInstantiator : MonoBehaviour
     {
         var edgeObj = Instantiate(_edgePrefab, Vector3.zero, Quaternion.identity, transform);
 
-        var edge = new Edge(nodeTable[edgeData.from], nodeTable[edgeData.to], edgeObj.GetComponent<LineRenderer>(), _3D);
+        var edge = new Edge(nodeTable[edgeData.from], nodeTable[edgeData.to], edgeObj.GetComponent<LineRenderer>(), edgeData, _3D);
 
         edge.SetMaterial(_useEmissiveMaterials
             ? _emissiveMaterials[_emissiveMaterials.Length - 1]

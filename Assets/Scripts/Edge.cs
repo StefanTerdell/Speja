@@ -6,11 +6,13 @@ public class Edge
     public Node from;
     public Node to;
     Vector3 lineRendererOffset;
-    public Edge(Node from, Node to, LineRenderer lr, bool _3D)
+    public EdgeData edgeData;
+    public Edge(Node from, Node to, LineRenderer lr, EdgeData edgeData, bool _3D)
     {
         this.from = from;
         this.to = to;
         this.lineRenderer = lr;
+        this.edgeData = edgeData;
 
         Set3D(_3D);
     }

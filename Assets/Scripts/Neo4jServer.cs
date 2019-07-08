@@ -32,7 +32,8 @@ public class Neo4jServer : MonoBehaviour
             wreq.Credentials = new NetworkCredential(_username, _password);
 
             var requestStream = new StreamWriter(wreq.GetRequestStream());
-            requestStream.Write("{\"statements\" : [ { \"statement\" : \"" + query + " LIMIT " + _limit + "\", \"resultDataContents\" : [ \"graph\" ] } ]}");
+
+            requestStream.Write($@"{{""statements"" : [ {{ ""statement"" : ""{query} LIMIT {_limit}"", ""resultDataContents"" : [ ""graph"" ] }} ]}}");
 
             requestStream.Flush();
             requestStream.Close();
@@ -47,15 +48,15 @@ public class Neo4jServer : MonoBehaviour
 
             if (_logResponse)
             {
-                Debug.Log("Request Headers:" + wreq.Headers);
-                Debug.Log("Response Json:" + responseJson);
+                Debug.Log($"Request Headers: {wreq.Headers}");
+                Debug.Log($"Response Json: {responseJson}");
             }
 
             return responseJson;
         }
         catch (WebException webex)
         {
-            Debug.LogError("neo4j connection failed.\nReason:" + webex.Message);
+            Debug.LogWarning($"Neo4j connection failed.\nReason: {webex.Message}");
 
             return "{}";
         }

@@ -3,15 +3,15 @@
 public class CameraMover : MonoBehaviour
 {
     
-    GraphInstantiator gi;
-    public float rotationSpeed;
-    public float moveSpeed;
-    public float shiftMultiplier;
-    public float ctrlMultiplier;
-    float currentMoveSpeed;
+    public float _rotationSpeed = 10;
+    public float _moveSpeed = 25;
+    public float _shiftMultiplier = 2;
+    public float _ctrlMultiplier = 4;
 
-    float perspectiveZPosition;
+    GraphInstantiator gi;
     Camera cam;
+    float perspectiveZPosition;
+    float currentMoveSpeed;
     void Start()
     {
         gi = FindObjectOfType<GraphInstantiator>();
@@ -34,11 +34,11 @@ public class CameraMover : MonoBehaviour
 
             if (Input.GetKey(KeyCode.Mouse1))
             {
-                currentMoveSpeed = moveSpeed;
+                currentMoveSpeed = _moveSpeed;
 
-                currentMoveSpeed *= Input.GetKey(KeyCode.LeftShift) ? shiftMultiplier : 1;
+                currentMoveSpeed *= Input.GetKey(KeyCode.LeftShift) ? _shiftMultiplier : 1;
 
-                currentMoveSpeed *= Input.GetKey(KeyCode.LeftControl) ? ctrlMultiplier : 1;
+                currentMoveSpeed *= Input.GetKey(KeyCode.LeftControl) ? _ctrlMultiplier : 1;
 
                 if (Input.GetKey(KeyCode.W))
                     cam.orthographicSize -= Time.deltaTime * currentMoveSpeed;
@@ -77,14 +77,14 @@ public class CameraMover : MonoBehaviour
             if (Input.GetKey(KeyCode.Mouse1))
             {
                 transform.eulerAngles = new Vector3(
-                    transform.eulerAngles.x + Input.GetAxis("Mouse Y") * rotationSpeed * -1,
-                    transform.eulerAngles.y + Input.GetAxis("Mouse X") * rotationSpeed);
+                    transform.eulerAngles.x + Input.GetAxis("Mouse Y") * _rotationSpeed * -1,
+                    transform.eulerAngles.y + Input.GetAxis("Mouse X") * _rotationSpeed);
 
-                currentMoveSpeed = moveSpeed;
+                currentMoveSpeed = _moveSpeed;
 
-                currentMoveSpeed *= Input.GetKey(KeyCode.LeftShift) ? shiftMultiplier : 1;
+                currentMoveSpeed *= Input.GetKey(KeyCode.LeftShift) ? _shiftMultiplier : 1;
 
-                currentMoveSpeed *= Input.GetKey(KeyCode.LeftControl) ? ctrlMultiplier : 1;
+                currentMoveSpeed *= Input.GetKey(KeyCode.LeftControl) ? _ctrlMultiplier : 1;
 
                 if (Input.GetKey(KeyCode.W))
                     transform.Translate(Vector3.forward * Time.deltaTime * currentMoveSpeed);
