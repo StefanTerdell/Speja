@@ -10,6 +10,9 @@
 /[Ll]ogs/
 /[Mm]emoryCaptures/
 
+library/
+Library/
+
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
 

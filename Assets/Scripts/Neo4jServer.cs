@@ -100,7 +100,14 @@ public class Neo4jServer : MonoBehaviour
                     {
                         public string id;
                         public List<string> labels;
-                        public dynamic properties;
+                        public NodeProperties properties;
+
+                        [System.Serializable]
+                        public class NodeProperties
+                        {
+                            public string uuid;
+                            public string name;
+                        }
                     }
 
                     [System.Serializable]
@@ -110,7 +117,11 @@ public class Neo4jServer : MonoBehaviour
                         public string type;
                         public string startNode;
                         public string endNode;
-                        public dynamic properties;
+                        // public EdgeProperties properties;
+                        // [System.Serializable]
+                        // public class EdgeProperties
+                        // {
+                        // }
                     }
                 }
             }

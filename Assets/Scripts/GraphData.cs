@@ -61,8 +61,8 @@ public class GraphData : MonoBehaviour
                         nodeDict.Add(node.id, new NodeData()
                         {
                             type = node.labels[0],
-                            name = node.properties?.name,
-                            uuid = node.properties?.uuid,
+                            name = node.properties.name,
+                            uuid = node.properties.uuid,
                         });
                     }
                 }
@@ -74,7 +74,7 @@ public class GraphData : MonoBehaviour
                         edgeDict.Add(edge.id, new EdgeData()
                         {
                             type = edge.type,
-                            uuid = edge.properties?.uuid,
+                            // uuid = edge.properties?.uuid,
                             from = nodeDict[edge.startNode],
                             to = nodeDict[edge.endNode]
                         });
@@ -142,11 +142,11 @@ public class GraphData : MonoBehaviour
         return node;
     }
 
-    EdgeData AddEdge(string uuid, string type, NodeData from, NodeData to)
+    EdgeData AddEdge(string type, NodeData from, NodeData to)
     {
         var edge = new EdgeData()
         {
-            uuid = uuid,
+            // uuid = uuid,
             type = type,
             from = from,
             to = to
@@ -194,7 +194,7 @@ public class GraphData : MonoBehaviour
 
             otherNodes.Remove(otherNode);
 
-            AddEdge(Guid.NewGuid().ToString(), RandomString(5), node, otherNode);
+            AddEdge(RandomString(5), node, otherNode);
             edges++;
         }
     }
