@@ -1,6 +1,6 @@
 # Speja
 
-![Alt text](capture.png?raw=true "Header")
+![Alt text](capture.png "Header")
 
 ## What is it?
 A fast force directed neo4j visualizer with both 2D and 3D projections. Features a proprietary multithreaded (C# Jobs, Burst Compiled) Fruchterman-Reingold force algorithm implementation.
@@ -20,4 +20,4 @@ Mouse and WASD. Left click to drag nodes around and make them stationary. Click 
 
 Right click to orbit a node. Click another node or into space to let go.
 
-![Alt text](layers.png?raw=true "Layers")
+![Alt text](layers.png "Layers")
