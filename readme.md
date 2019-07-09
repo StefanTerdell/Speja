@@ -1,6 +1,6 @@
 # Speja
 
-![Alt text](Capture.png?raw=true "Layers")
+![Alt text](Capture.png?raw=true "Header")
 
 ## What is it?
 A fast force directed neo4j visualizer with both 2D and 3D projections. Features a proprietary multithreaded (C# Jobs, Burst Compiled) Fruchterman-Reingold force algorithm implementation.
