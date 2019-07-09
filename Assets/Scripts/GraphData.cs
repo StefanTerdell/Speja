@@ -6,36 +6,41 @@ using UnityEngine;
 
 public class GraphData : MonoBehaviour
 {
+    [Header("Current")]
     public int NodeCount;
     public int EdgeCount;
+
+    public bool _reset;
+
+    [Header("Neo4j")]
+    public string _neo4jQuery = "MATCH (n) OPTIONAL MATCH (n)-[r]-() RETURN n, r";
     public bool _addNeo4jNodes;
-    public bool _sendReset;
-    public int _nodesToAdd;
-    public bool _addNodes;
-    public int _nodesToRemove;
-    public bool _removeNodes;
+    [Header("Random")]
+    public int _randomNodesToAdd;
+    public bool _addRandomNodes;
+    public int _randomNodesToRemove;
+    public bool _removeRandomNodes;
+    [Space(6)]
+    public float _maxRandomEdges = 2;
+    public float _leastRandomEdges = 1;
+    public float _randomEdgeChance = .1f;
 
-    public float _maxEdges = 2;
-    public float _leastEdges = 1;
-    public float _edgeChance = .1f;
-
-    public List<NodeData> nodes = new List<NodeData>();
-    public List<EdgeData> edges = new List<EdgeData>();
-
-    static GraphData instance;
-    public static List<NodeData> Nodes => instance.nodes;
-    public static List<EdgeData> Edges => instance.edges;
-
+    public static List<NodeData> NodeDataSet => instance.nodeDataSet;
+    public static List<EdgeData> EdgeDataSet => instance.edgeDataSet;
     public static event EventHandler OnGraphReset;
     public static event EventHandler OnNodeAdded;
     public static event EventHandler OnNodeRemoved;
     public static event EventHandler OnEdgeAdded;
     public static event EventHandler OnEdgeRemoved;
+    static GraphData instance;
 
     void Awake()
     {
         instance = this;
     }
+
+    List<NodeData> nodeDataSet = new List<NodeData>();
+    List<EdgeData> edgeDataSet = new List<EdgeData>();
 
     void Start()
     {
@@ -45,46 +50,46 @@ public class GraphData : MonoBehaviour
 
     void AddNeo4jNodesAndEdges()
     {
-        var queryObject = Neo4jServer.QueryObject("match (n) optional match (n)-[r]-() return n, r");
+        var queryObject = Neo4jServer.QueryObject(_neo4jQuery);
 
-        var nodeDict = new Dictionary<string, NodeData>();
-        var edgeDict = new Dictionary<string, EdgeData>();
+        var neo4jNodes = new Dictionary<string, NodeData>();
+        var neo4jEdges = new Dictionary<string, EdgeData>();
 
         foreach (var result in queryObject.results)
         {
             foreach (var data in result.data)
             {
-                foreach (var node in data.graph.nodes)
+                foreach (var neo4jNode in data.graph.nodes)
                 {
-                    if (!nodeDict.ContainsKey(node.id))
+                    if (!neo4jNodes.ContainsKey(neo4jNode.id))
                     {
-                        nodeDict.Add(node.id, new NodeData()
+                        neo4jNodes.Add(neo4jNode.id, new NodeData()
                         {
-                            type = node.labels[0],
-                            name = node.properties.name,
-                            uuid = node.properties.uuid,
+                            type = neo4jNode.labels[0],
+                            name = neo4jNode.properties.name,
+                            uuid = neo4jNode.properties.uuid,
                         });
                     }
                 }
 
-                foreach (var edge in data.graph.relationships)
+                foreach (var neo4jEdge in data.graph.relationships)
                 {
-                    if (!edgeDict.ContainsKey(edge.id))
+                    if (!neo4jEdges.ContainsKey(neo4jEdge.id))
                     {
-                        edgeDict.Add(edge.id, new EdgeData()
+                        neo4jEdges.Add(neo4jEdge.id, new EdgeData()
                         {
-                            type = edge.type,
+                            type = neo4jEdge.type,
                             // uuid = edge.properties?.uuid,
-                            from = nodeDict[edge.startNode],
-                            to = nodeDict[edge.endNode]
+                            from = neo4jNodes[neo4jEdge.startNode],
+                            to = neo4jNodes[neo4jEdge.endNode]
                         });
                     }
                 }
             }
         }
 
-        nodes.AddRange(nodeDict.Values.ToList());
-        edges.AddRange(edgeDict.Values.ToList());
+        nodeDataSet.AddRange(neo4jNodes.Values.ToList());
+        edgeDataSet.AddRange(neo4jEdges.Values.ToList());
 
         if (OnGraphReset != null)
             OnGraphReset(null, EventArgs.Empty);
@@ -92,8 +97,8 @@ public class GraphData : MonoBehaviour
 
     void Update()
     {
-        NodeCount = nodes.Count;
-        EdgeCount = edges.Count;
+        NodeCount = nodeDataSet.Count;
+        EdgeCount = edgeDataSet.Count;
 
         if (_addNeo4jNodes)
         {
@@ -102,23 +107,23 @@ public class GraphData : MonoBehaviour
             AddNeo4jNodesAndEdges();
         }
 
-        if (_addNodes)
+        if (_addRandomNodes)
         {
-            _addNodes = false;
+            _addRandomNodes = false;
 
-            AddRandomNodes(_nodesToAdd);
+            AddRandomNodes(_randomNodesToAdd);
         }
 
-        if (_removeNodes)
+        if (_removeRandomNodes)
         {
-            _removeNodes = false;
+            _removeRandomNodes = false;
 
-            RemoveRandomNodes(_nodesToRemove);
+            RemoveRandomNodes(_randomNodesToRemove);
         }
 
-        if (_sendReset)
+        if (_reset)
         {
-            _sendReset = false;
+            _reset = false;
 
             if (OnGraphReset != null)
                 OnGraphReset(null, EventArgs.Empty);
@@ -134,7 +139,7 @@ public class GraphData : MonoBehaviour
             name = name
         };
 
-        nodes.Add(node);
+        nodeDataSet.Add(node);
 
         if (OnNodeAdded != null)
             OnNodeAdded(node, EventArgs.Empty);
@@ -152,7 +157,7 @@ public class GraphData : MonoBehaviour
             to = to
         };
 
-        edges.Add(edge);
+        edgeDataSet.Add(edge);
 
         if (OnEdgeAdded != null)
             OnEdgeAdded(edge, EventArgs.Empty);
@@ -179,15 +184,15 @@ public class GraphData : MonoBehaviour
 
     void AddRandomEdges(NodeData node)
     {
-        var otherNodes = nodes.Where(n => n != node).ToList();
+        var otherNodes = nodeDataSet.Where(n => n != node).ToList();
 
         var edges = 0;
-        for (var i = 0; i < _maxEdges; i++)
+        for (var i = 0; i < _maxRandomEdges; i++)
         {
             if (otherNodes.Count == 0)
                 break;
 
-            if (UnityEngine.Random.value < _edgeChance && edges >= _leastEdges)
+            if (UnityEngine.Random.value < _randomEdgeChance && edges >= _leastRandomEdges)
                 continue;
 
             var otherNode = otherNodes[UnityEngine.Random.Range(0, otherNodes.Count)];
@@ -201,12 +206,12 @@ public class GraphData : MonoBehaviour
 
     void RemoveRandomNodes(float nodesToRemove)
     {
-        if (nodes.Count < nodesToRemove)
-            nodesToRemove = nodes.Count;
+        if (nodeDataSet.Count < nodesToRemove)
+            nodesToRemove = nodeDataSet.Count;
 
         for (int i = 0; i < nodesToRemove; i++)
         {
-            var node = nodes[UnityEngine.Random.Range(0, nodes.Count)];
+            var node = nodeDataSet[UnityEngine.Random.Range(0, nodeDataSet.Count)];
 
             RemoveNode(node);
         }
@@ -214,14 +219,14 @@ public class GraphData : MonoBehaviour
 
     void RemoveNode(NodeData node)
     {
-        nodes.Remove(node);
+        nodeDataSet.Remove(node);
 
-        var edgeCount = edges.Count;
+        var edgeCount = edgeDataSet.Count;
         for (var i = 0; i < edgeCount; i++)
         {
-            if (edges[i].from == node || edges[i].to == node)
+            if (edgeDataSet[i].from == node || edgeDataSet[i].to == node)
             {
-                RemoveEdge(edges[i]);
+                RemoveEdge(edgeDataSet[i]);
                 edgeCount--;
                 i--;
             }
@@ -233,7 +238,7 @@ public class GraphData : MonoBehaviour
 
     void RemoveEdge(EdgeData edge)
     {
-        edges.Remove(edge);
+        edgeDataSet.Remove(edge);
 
         if (OnEdgeRemoved != null)
             OnEdgeRemoved(edge, EventArgs.Empty);

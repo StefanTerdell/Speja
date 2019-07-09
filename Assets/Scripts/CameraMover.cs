@@ -22,13 +22,13 @@ public class CameraMover : MonoBehaviour
         cam = GetComponent<Camera>();
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (Input.GetKey(KeyCode.Mouse1))
         {
             holdTime += Time.deltaTime;
         }
-        else if (Input.GetKeyUp(KeyCode.Mouse1) && holdTime < .1f)
+        else if (Input.GetKeyUp(KeyCode.Mouse1) && holdTime < .2f)
         {
             if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out var hitInfo))
             {

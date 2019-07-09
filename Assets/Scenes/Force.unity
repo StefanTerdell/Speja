@@ -772,6 +772,7 @@ GameObject:
   - component: {fileID: 1056093527}
   - component: {fileID: 1056093529}
   - component: {fileID: 1056093528}
+  - component: {fileID: 1056093530}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -950,6 +951,22 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   priority: 1
+--- !u!114 &1056093530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056093522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c80c73519f1731a48a59df670804c256, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 0
+  rotationSpeed: 0
+  moveLerp: 0
+  rotationLerp: 0
 --- !u!1 &1214878703
 GameObject:
   m_ObjectHideFlags: 0
@@ -989,15 +1006,11 @@ MonoBehaviour:
   _cameraLayer: 0
   _useEmissiveMaterials: 0
   _emissiveMaterials:
-  - {fileID: 2100000, guid: 144f53e3faf15e64da993bd95f665cc3, type: 2}
-  - {fileID: 2100000, guid: 4931243af41c61c46a6ed45a9b29716d, type: 2}
-  - {fileID: 2100000, guid: b0c6ebce761cfce4abf606fac4cf5bd0, type: 2}
-  - {fileID: 2100000, guid: fee918d1e63c6a2418aa8fb90de31d03, type: 2}
+    nodes: {fileID: 2100000, guid: 144f53e3faf15e64da993bd95f665cc3, type: 2}
+    edges: {fileID: 2100000, guid: fee918d1e63c6a2418aa8fb90de31d03, type: 2}
   _unlitMaterials:
-  - {fileID: 2100000, guid: 9ad90800dd4f7d340a11276faebdc999, type: 2}
-  - {fileID: 2100000, guid: 8f2c88d5c64eda24d9451ac0909d821f, type: 2}
-  - {fileID: 2100000, guid: 24fe8249ec3ec2946bbec78f2e034379, type: 2}
-  - {fileID: 2100000, guid: db9a20988a9b5eb458733dea828e3636, type: 2}
+    nodes: {fileID: 2100000, guid: 9ad90800dd4f7d340a11276faebdc999, type: 2}
+    edges: {fileID: 2100000, guid: db9a20988a9b5eb458733dea828e3636, type: 2}
   _spawnRadius: 10
   _layerSeparation: 5
   _useLayerSeparation: 0
@@ -1737,9 +1750,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a28d3fd43d018774c80703791548cb1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _name: 0
+  _type: 0
   _respawn: 0
   _cullingDistance: 30
   _scaleMultiplier: 10
+  _maxScale: 10
   _labelPrefab: {fileID: 7325671348766431051, guid: f9d26798a508f5f4e9de0e58fb6da089,
     type: 3}
 --- !u!1 &1958608319
@@ -1841,15 +1857,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NodeCount: 0
   EdgeCount: 0
+  _reset: 0
+  _neo4jQuery: MATCH (n) OPTIONAL MATCH (n)-[r]-() RETURN n, r
   _addNeo4jNodes: 0
-  _sendReset: 0
-  _nodesToAdd: 0
-  _addNodes: 0
-  _nodesToRemove: 0
-  _removeNodes: 0
-  _maxEdges: 2
-  _leastEdges: 1
-  _edgeChance: 0.48
+  _randomNodesToAdd: 0
+  _addRandomNodes: 0
+  _randomNodesToRemove: 0
+  _removeRandomNodes: 0
+  _maxRandomEdges: 2
+  _leastRandomEdges: 1
+  _randomEdgeChance: 0.1
 --- !u!4 &2047936866
 Transform:
   m_ObjectHideFlags: 0

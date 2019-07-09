@@ -1,6 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class Materials
+{
+    public Material nodes;
+    public Material edges;
+}
+
 public class GraphInstantiator : MonoBehaviour
 {
     public bool _3D;
@@ -9,8 +16,8 @@ public class GraphInstantiator : MonoBehaviour
     public GameObject _edgePrefab;
     public int _cameraLayer;
     public bool _useEmissiveMaterials;
-    public Material[] _emissiveMaterials;
-    public Material[] _unlitMaterials;
+    public Materials _emissiveMaterials;
+    public Materials _unlitMaterials;
     public float _spawnRadius = 10;
     public float _layerSeparation = 5;
     public bool _useLayerSeparation;
@@ -26,13 +33,13 @@ public class GraphInstantiator : MonoBehaviour
     public static event System.EventHandler OnNodeAdded;
     public static event System.EventHandler OnNodeRemoved;
 
-    bool __3D;
+    bool known3D;
 
     private void Update()
     {
-        if (_3D != __3D)
+        if (_3D != known3D)
         {
-            __3D = _3D;
+            known3D = _3D;
             SwitchProjection();
         }
 
@@ -95,7 +102,7 @@ public class GraphInstantiator : MonoBehaviour
     {
         Camera.main.gameObject.layer = _cameraLayer;
 
-        foreach (var nodeData in GraphData.Nodes)
+        foreach (var nodeData in GraphData.NodeDataSet)
         {
             if (nodeTable.ContainsKey(nodeData))
                 DestroyNode(nodeData);
@@ -103,7 +110,7 @@ public class GraphInstantiator : MonoBehaviour
             InstantiateNode(nodeData);
         }
 
-        foreach (var edgeData in GraphData.Edges)
+        foreach (var edgeData in GraphData.EdgeDataSet)
         {
             if (edgeTable.ContainsKey(edgeData))
                 DestroyEdge(edgeData);
@@ -174,12 +181,12 @@ public class GraphInstantiator : MonoBehaviour
         {
             if (_useEmissiveMaterials)
             {
-                render.material = _emissiveMaterials[0];
+                render.material = _emissiveMaterials.nodes;
                 render.material.SetColor("_EmissionColor", type.color);
             }
             else
             {
-                render.material = _unlitMaterials[0];
+                render.material = _unlitMaterials.nodes;
             }
 
             render.material.color = type.color;
@@ -215,8 +222,8 @@ public class GraphInstantiator : MonoBehaviour
         var edge = new Edge(nodeTable[edgeData.from], nodeTable[edgeData.to], edgeObj.GetComponent<LineRenderer>(), edgeData, _3D);
 
         edge.SetMaterial(_useEmissiveMaterials
-            ? _emissiveMaterials[_emissiveMaterials.Length - 1]
-            : _unlitMaterials[_unlitMaterials.Length - 1]);
+            ? _emissiveMaterials.edges
+            : _unlitMaterials.edges);
 
         edgeTable.Add(edgeData, edge);
         Edges.Add(edge);
