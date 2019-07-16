@@ -9,6 +9,8 @@ public class FruchtermanReingold : MonoBehaviour
 {
     [Range(0.01f, 10)] public float _dispersion = 1;
     [Range(0.1f, 100)] public float _speed = 20;
+    public float _maximumForceMagnitude = 50000;
+
 
     List<Edge> edges => GraphInstantiator.Edges;
     List<Node> nodes => GraphInstantiator.Nodes;
@@ -54,9 +56,10 @@ public class FruchtermanReingold : MonoBehaviour
         foreach (var edge in edges)
         {
             var diff = edge.from.position - edge.to.position;
+            var sqrDist = diff.sqrMagnitude;
 
-            edge.from.AddForce(diff * 2 / _dispersion * _speed * -1);
-            edge.to.AddForce(diff * 2 / _dispersion * _speed);
+            edge.from.AddForce(diff * sqrDist / _dispersion * _speed * -1);
+            edge.to.AddForce(diff * sqrDist / _dispersion * _speed);
         }
 
         for (int i = 0; i < nodes.Count; i++)
@@ -72,7 +75,7 @@ public class FruchtermanReingold : MonoBehaviour
         for (int i = 0; i < nodes.Count; i++)
         {
             nodes[i].AddForce(nodeForces[i]);
-            nodes[i].ApplyForce();
+            nodes[i].ApplyForce(_maximumForceMagnitude * Time.deltaTime);
 
             nodeForces[i] = Vector3.zero;
         }

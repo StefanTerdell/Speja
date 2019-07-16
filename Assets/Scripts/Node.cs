@@ -49,7 +49,16 @@ public class Node
     public void ApplyForce()
     {
         rigidbody.AddForce(unappliedForce);
+
         unappliedForce = Vector3.zero;
+    }
+
+    public void ApplyForce(float maximumMagnitude)
+    {
+        if (unappliedForce.sqrMagnitude > maximumMagnitude * maximumMagnitude)
+            unappliedForce = unappliedForce.normalized * maximumMagnitude;
+
+        ApplyForce();
     }
 
     public void DestroyGameObject()
